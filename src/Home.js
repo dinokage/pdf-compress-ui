@@ -33,7 +33,7 @@ function Home() {
     const formData = new FormData();
     formData.append("pdf",selectedFile);
     // API CALL
-    const uploadURL = await axios.get('http://localhost:5125/upload')
+    const uploadURL = await axios.get('https://basic-express-presign.vercel.app/upload')
     console.log(uploadURL)
     try {
       const res = await fetch(uploadURL.data.url, {

@@ -69,7 +69,7 @@ function Home() {
     console.log(selectedFile['type'].split('/')[1])
   }
   return (
-    <div className=" max-w-72 flex flex-row min-h-screen justify-center items-center">
+    <div className="flex flex-row min-h-screen justify-center items-center">
       <form className="FileForm" onSubmit={changeHandler} >
         <label><div className="border-solid border-2 border-gray-600 py-10 rounded-lg">Upload file here</div>
         <input id="fileUpload" className="FileSelect" type="file" name="file" onChange={changeHandler} accept="application/pdf"/></label>

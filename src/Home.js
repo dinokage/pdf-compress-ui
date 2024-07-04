@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Button } from "@chakra-ui/react";
 import {save} from 'save-file';
+import ReactLoading from 'react-loading'
 function Home() {
   const [selectedFile, setSelectedFile] = useState();
   const [isFilePicked, setIsFilePicked] = useState(false);
   const [message, setMessage] = useState('')
   const [downloadURL, setDownloadURL] = useState('')
   const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
   const changeHandler = (event) => {
     setSelectedFile(event.target.files[0]);
     console.log(event.target.files[0])
@@ -30,6 +32,7 @@ function Home() {
       setMessage("select PDF pliz")
       return
     }
+    setLoading(true)
     const formData = new FormData();
     formData.append("pdf",selectedFile);
     // API CALL
@@ -47,7 +50,12 @@ function Home() {
       console.log('Upload successful:', res);
       
       setDownloadURL(`https://compressed-pdfs-dino.s3.ap-south-1.amazonaws.com/compressed/${uploadURL.data.key}`)
-      setSuccess(true);
+      setTimeout(() => {
+        setLoading(false)
+        setSelectedFile(null);
+        setIsFilePicked(false);
+        setSuccess(true);
+      }, 7000)
       
       // Handle successful upload (e.g., display success message)
     } catch (error) {
@@ -61,16 +69,20 @@ function Home() {
     console.log(selectedFile['type'].split('/')[1])
   }
   return (
-    <div className="App">
-      <input type="file" name="file" onChange={changeHandler} accept="application/pdf"/>
-      <div>{message}
+    <div className=" max-w-72 flex flex-row min-h-screen justify-center items-center">
+      <form className="FileForm" onSubmit={changeHandler} >
+        <label><div className="border-solid border-2 border-gray-600 py-10 rounded-lg">Upload file here</div>
+        <input id="fileUpload" className="FileSelect" type="file" name="file" onChange={changeHandler} accept="application/pdf"/></label>
+      
+      <div className="py-5">{message}
         {/* <button onClick={handleSubmission}>Submit</button> */}
-        <Button colorScheme="cyan" onClick={handleSubmission}>
+        <Button className="SubmitButton" colorScheme="cyan" onClick={handleSubmission}>
           Compress!
         </Button>
       </div>
+      </form>
       {isFilePicked && selectedFile ? (
-        <div>
+        <div className="text-green-500 text-4xl font-bold">
           <p>Filename: {selectedFile.name}</p>
           <p>Filetype: {selectedFile.type}</p>
           <p>Size in bytes: {selectedFile.size}</p>
@@ -80,12 +92,12 @@ function Home() {
           </p>
         </div>
       ) : (
-        <div>
-          <p>Select a file</p>
-        </div>
+        null
       )}
+      {loading? (<ReactLoading type="spin" color="#0000FF"
+                height={100} width={50}/>) : (null)}
       {success ? (
-        <Button onClick={downloadHandler}>Download </Button>
+        <Button className="DownloadButton" onClick={downloadHandler}>Download </Button>
       ): (null)}
     </div>
   );

@@ -46,7 +46,7 @@ function Home() {
       
       console.log('Upload successful:', res);
       
-      setDownloadURL(`https://compressed-pdfs-dino.s3.ap-south-1.amazonaws.com/${uploadURL.data.key}`)
+      setDownloadURL(`https://compressed-pdfs-dino.s3.ap-south-1.amazonaws.com/compressed/${uploadURL.data.key}`)
       setSuccess(true);
       
       // Handle successful upload (e.g., display success message)

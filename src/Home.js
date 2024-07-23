@@ -10,6 +10,7 @@ function Home() {
   const [downloadURL, setDownloadURL] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [time, setTime] = useState(0)
   const changeHandler = (event) => {
     setSelectedFile(event.target.files[0]);
     console.log(event.target.files[0])
@@ -36,26 +37,34 @@ function Home() {
     const formData = new FormData();
     formData.append("pdf",selectedFile);
     // API CALL
-    const uploadURL = await axios.get('https://basic-express-presign.vercel.app/upload')
+    const uploadURL = await axios.get(process.env.REACT_APP_PRESIGN_API)
     console.log(uploadURL)
     try {
       const res = await fetch(uploadURL.data.url, {
         method: "PUT",
         headers: {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*"
         },
         body: selectedFile
       })
       
       console.log('Upload successful:', res);
       
-      setDownloadURL(`https://compressed-pdfs-dino.s3.ap-south-1.amazonaws.com/compressed/${uploadURL.data.key}`)
-      setTimeout(() => {
-        setLoading(false)
-        setSelectedFile(null);
-        setIsFilePicked(false);
-        setSuccess(true);
-      }, 7000)
+      // setDownloadURL(`https://compressed-pdfs-dino.s3.ap-south-1.amazonaws.com/compressed/${uploadURL.data.key}`)
+      const poll = setInterval(async () => {
+        var status = await axios.post(process.env.REACT_APP_STATUS_CHECK, {name:uploadURL.data.key})
+        console.log(status)
+        if (status.data.completed) {
+          setDownloadURL(status.data.url)
+          setTime(status.data.elapsed)
+          setLoading(false);
+          setSelectedFile(null);
+          setIsFilePicked(false);
+          setSuccess(true);
+          clearInterval(poll);
+        }
+      }, 3000)
       
       // Handle successful upload (e.g., display success message)
     } catch (error) {
@@ -69,6 +78,7 @@ function Home() {
     console.log(selectedFile['type'].split('/')[1])
   }
   return (
+    
     <div className="flex flex-row min-h-screen justify-center items-center">
       <form className="FileForm" onSubmit={changeHandler} >
         <label><div className="border-solid border-2 border-gray-600 py-10 rounded-lg">Upload file here</div>
@@ -88,7 +98,7 @@ function Home() {
           <p>Size in bytes: {selectedFile.size}</p>
           <p>
             lastModifiedDate:{" "}
-            {selectedFile.lastModifiedDate.toLocaleDateString()}
+            {Date(selectedFile.lastModified)}
           </p>
         </div>
       ) : (
@@ -96,8 +106,10 @@ function Home() {
       )}
       {loading? (<ReactLoading type="spin" color="#0000FF"
                 height={100} width={50}/>) : (null)}
-      {success ? (
+      {success ? (<>
         <Button className="DownloadButton" onClick={downloadHandler}>Download </Button>
+        elapsed time : { time }
+        </>
       ): (null)}
     </div>
   );

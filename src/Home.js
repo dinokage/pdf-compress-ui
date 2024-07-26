@@ -11,6 +11,9 @@ function Home() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const [time, setTime] = useState(0)
+  const [initialSize, setInitialSize] = useState(0)
+  const [finalSize, setFinalSize] = useState(0)
+  
   const changeHandler = (event) => {
     setSelectedFile(event.target.files[0]);
     console.log(event.target.files[0])
@@ -36,6 +39,7 @@ function Home() {
     setLoading(true)
     const formData = new FormData();
     formData.append("pdf",selectedFile);
+    setInitialSize(selectedFile.size)
     // API CALL
     const uploadURL = await axios.get(process.env.REACT_APP_PRESIGN_API)
     console.log(uploadURL)
@@ -58,6 +62,7 @@ function Home() {
         if (status.data.completed) {
           setDownloadURL(status.data.url)
           setTime(status.data.elapsed)
+          setFinalSize(status.url.finalsize)
           setLoading(false);
           setSelectedFile(null);
           setIsFilePicked(false);
@@ -95,7 +100,7 @@ function Home() {
         <div className="text-green-500 text-4xl font-bold">
           <p>Filename: {selectedFile.name}</p>
           <p>Filetype: {selectedFile.type}</p>
-          <p>Size in bytes: {selectedFile.size}</p>
+          <p>Size in bytes: {selectedFile.size / 1024}</p>
           <p>
             lastModifiedDate:{" "}
             {Date(selectedFile.lastModified)}
@@ -109,6 +114,8 @@ function Home() {
       {success ? (<>
         <Button className="DownloadButton" onClick={downloadHandler}>Download </Button>
         elapsed time : { time }
+        initial size : { initialSize }
+        final size : { finalSize }
         </>
       ): (null)}
     </div>

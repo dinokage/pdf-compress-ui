@@ -62,7 +62,6 @@ function Home() {
         if (status.data.completed) {
           setDownloadURL(status.data.url)
           setTime(status.data.elapsed)
-          setFinalSize(status.url.finalsize)
           setLoading(false);
           setSelectedFile(null);
           setIsFilePicked(false);

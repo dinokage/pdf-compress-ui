@@ -69,7 +69,7 @@ function Home() {
           setSuccess(true);
           clearInterval(poll);
         }
-      }, 3000)
+      }, 5000)
       
       // Handle successful upload (e.g., display success message)
     } catch (error) {

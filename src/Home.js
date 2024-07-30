@@ -39,7 +39,6 @@ function Home() {
     setLoading(true)
     const formData = new FormData();
     formData.append("pdf",selectedFile);
-    setInitialSize(selectedFile.size)
     // API CALL
     const uploadURL = await axios.get(process.env.REACT_APP_PRESIGN_API)
     console.log(uploadURL)
@@ -58,10 +57,13 @@ function Home() {
       // setDownloadURL(`https://compressed-pdfs-dino.s3.ap-south-1.amazonaws.com/compressed/${uploadURL.data.key}`)
       const poll = setInterval(async () => {
         var status = await axios.post(process.env.REACT_APP_STATUS_CHECK, {name:uploadURL.data.key})
+        let data = status.data
         console.log(status)
-        if (status.data.completed) {
-          setDownloadURL(status.data.url)
-          setTime(status.data.elapsed)
+        if (data.completed) {
+          setDownloadURL(data.url)
+          setTime(data.elapsed)
+          setInitialSize(data.initalSize)
+          setFinalSize(data.finalSize)
           setLoading(false);
           setSelectedFile(null);
           setIsFilePicked(false);
@@ -110,12 +112,12 @@ function Home() {
       )}
       {loading? (<ReactLoading type="spin" color="#0000FF"
                 height={100} width={50}/>) : (null)}
-      {success ? (<>
+      {success ? (<div>
         <Button className="DownloadButton" onClick={downloadHandler}>Download </Button>
-        elapsed time : { time }
-        initial size : { initialSize }
-        final size : { finalSize }
-        </>
+        <p>elapsed time : { time } seconds</p>
+        <p>initial size : { initialSize } KB</p>
+        <p>final size : { finalSize } KB</p>
+        </div>
       ): (null)}
     </div>
   );

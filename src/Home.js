@@ -85,7 +85,7 @@ function Home() {
   }
   return (
     
-    <div className="flex flex-row min-h-screen justify-center items-center">
+    <div className="flex flex-row mr-auto justify-center items-center">
       <form className="FileForm" onSubmit={changeHandler} >
         <label><div className="border-solid border-2 border-gray-600 py-10 rounded-lg">Upload file here</div>
         <input id="fileUpload" className="FileSelect" type="file" name="file" onChange={changeHandler} accept="application/pdf"/></label>
